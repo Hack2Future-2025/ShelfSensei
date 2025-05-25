@@ -198,8 +198,8 @@ export default function Categories() {
         page: pagination.page,
         limit: pagination.limit,
         search: debouncedSearch,
-        sortBy,
-        sortOrder
+          sortBy,
+          sortOrder
       };
 
       const response = await api.get('/api/categories', { params });
@@ -316,22 +316,22 @@ export default function Categories() {
                 type="text"
                 name="search"
                 id="search"
-                value={search}
+            value={search}
                 onChange={handleSearch}
                 className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                placeholder="Search categories..."
-              />
-            </div>
+            placeholder="Search categories..."
+          />
+        </div>
 
             {/* Add Category Button */}
-            <button
+          <button
               type="button"
               onClick={() => setShowAddModal(true)}
               className="inline-flex items-center gap-x-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
+          >
               <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
               Add Category
-            </button>
+          </button>
           </div>
         </div>
       </div>
@@ -387,21 +387,21 @@ export default function Categories() {
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
-              </th>
+          </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
-            {categories.map((category) => (
+          {categories.map((category) => (
               <tr key={category.id} className="hover:bg-gray-50 transition-colors duration-150">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-900">{category.name}</span>
                     <span className="text-xs text-gray-500">ID: {category.id}</span>
                   </div>
-                </td>
+              </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {category.products?.length || 0}
-                </td>
+                {category.products?.length || 0}
+              </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
                     onClick={() => {
@@ -429,7 +429,7 @@ export default function Categories() {
                 <td colSpan="3" className="px-6 py-4 text-center text-sm text-gray-500">
                   {search ? 'No results found' : 'No categories found'}
                 </td>
-              </tr>
+            </tr>
             )}
           </tbody>
         </table>
@@ -515,4 +515,4 @@ export default function Categories() {
       )}
     </div>
   );
-}
+} 

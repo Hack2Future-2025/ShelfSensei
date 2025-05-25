@@ -138,8 +138,8 @@ export default function Vendors() {
         page: pagination.page,
         limit: pagination.limit,
         search: debouncedSearch,
-        sortBy,
-        sortOrder
+          sortBy,
+          sortOrder
       };
 
       const response = await api.get('/api/vendors', { params });
@@ -233,9 +233,9 @@ export default function Vendors() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-      </div>
-    );
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+    </div>
+  );
   }
 
   return (
@@ -261,17 +261,17 @@ export default function Vendors() {
                 className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 placeholder="Search vendors..."
               />
-            </div>
+        </div>
 
             {/* Add Vendor Button */}
-            <button
+          <button
               type="button"
-              onClick={() => setShowAddModal(true)}
+            onClick={() => setShowAddModal(true)}
               className="inline-flex items-center gap-x-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
+          >
               <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
-              Add Vendor
-            </button>
+            Add Vendor
+          </button>
           </div>
         </div>
       </div>
@@ -295,7 +295,7 @@ export default function Vendors() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
             <tr className="bg-gray-50">
-              <th
+              <th 
                 onClick={() => handleSort('name')}
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group"
               >
@@ -325,7 +325,7 @@ export default function Vendors() {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button
+                  <button 
                     onClick={() => {
                       setSelectedVendor(vendor);
                       setShowViewModal(true);
@@ -334,7 +334,7 @@ export default function Vendors() {
                   >
                     View
                   </button>
-                  <button
+                  <button 
                     onClick={() => {
                       setSelectedVendor(vendor);
                       setShowEditModal(true);
@@ -467,15 +467,15 @@ export default function Vendors() {
 
       {/* Edit Vendor Modal */}
       {showEditModal && (
-        <EditVendorModal
-          show={showEditModal}
-          onClose={() => {
-            setShowEditModal(false);
-            setSelectedVendor(null);
-          }}
-          onSubmit={handleEditVendor}
-          vendor={selectedVendor}
-        />
+      <EditVendorModal 
+        show={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setSelectedVendor(null);
+        }}
+        onSubmit={handleEditVendor}
+        vendor={selectedVendor}
+      />
       )}
     </div>
   );

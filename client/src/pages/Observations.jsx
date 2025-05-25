@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/axios';
 import ChatBot from '../components/ChatBot';
-import Modal from '../components/Modal';
 
 export default function Observations() {
   const { user } = useAuth();
@@ -141,61 +140,59 @@ export default function Observations() {
 
   return (
     <div className="container mx-auto px-4">
-      <div className="mb-8 bg-white p-6 rounded-lg shadow">
-        <div className="flex flex-col sm:flex-row justify-between gap-6">
-          <div className="flex items-center justify-between w-full">
-            <h1 className="text-2xl font-bold text-gray-900">Forecast Observations</h1>
-            
-            <button
-              onClick={() => setIsChatOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200"
-            >
-              <svg 
-                className="w-5 h-5" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" 
-                />
-              </svg>
-              <span>Chat with AI</span>
-            </button>
-          </div>
+      <div className="flex flex-col sm:flex-row justify-between gap-6">
+        <div className="flex items-center justify-between w-full">
+          <h1 className="text-2xl font-bold text-gray-900">Forecast Observations</h1>
           
-          <div className="w-64">
-            <label htmlFor="shop" className="block text-sm font-medium text-gray-700 mb-1">
-              Select Shop
-            </label>
-            <select
-              id="shop"
-              value={selectedShop || ''}
-              onChange={handleShopChange}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm h-10"
-              required
+          <button
+            onClick={() => setIsChatOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200"
+          >
+            <svg 
+              className="w-5 h-5" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
             >
-              {user?.shops?.map(shop => (
-                <option key={shop.id} value={shop.id}>
-                  {shop.name}
-                </option>
-              ))}
-            </select>
-          </div>
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" 
+              />
+            </svg>
+            <span>Chat with AI</span>
+          </button>
         </div>
+        
+        <div className="w-64">
+          <label htmlFor="shop" className="block text-sm font-medium text-gray-700 mb-1">
+            Select Shop
+          </label>
+          <select
+            id="shop"
+            value={selectedShop || ''}
+            onChange={handleShopChange}
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm h-10"
+            required
+          >
+            {user?.shops?.map(shop => (
+              <option key={shop.id} value={shop.id}>
+                {shop.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
-        <div className="mt-4">
-          <input
-            type="text"
-            placeholder="Search products, observations..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-          />
-        </div>
+      <div className="mt-4">
+        <input
+          type="text"
+          placeholder="Search products, observations..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+        />
       </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -282,14 +279,14 @@ export default function Observations() {
         </div>
       )}
 
-      {/* Chat Modal */}
-      <Modal isOpen={isChatOpen} onClose={() => setIsChatOpen(false)}>
-        <div className="w-full">
-          <ChatBot shopId={selectedShop} />
-        </div>
-      </Modal>
+      {/* ChatBot Sidebar */}
+      <ChatBot 
+        shopId={selectedShop} 
+        isOpen={isChatOpen} 
+        onClose={() => setIsChatOpen(false)} 
+      />
 
-      {/* Floating Chat Button (visible on mobile) */}
+      {/* Mobile Chat Button */}
       <button
         onClick={() => setIsChatOpen(true)}
         className="fixed bottom-6 right-6 p-4 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200 sm:hidden"

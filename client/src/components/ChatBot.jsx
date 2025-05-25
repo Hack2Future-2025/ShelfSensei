@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import api from '../utils/axios';
 
-export default function ChatBot({ shopId }) {
+export default function ChatBot({ shopId, isOpen, onClose }) {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -16,10 +16,11 @@ export default function ChatBot({ shopId }) {
     scrollToBottom();
   }, [messages]);
 
-  // Focus input when chat opens
   useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+    if (isOpen) {
+      inputRef.current?.focus();
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,16 +32,12 @@ export default function ChatBot({ shopId }) {
     setIsLoading(true);
 
     try {
-      console.log('Sending request with:', { shopId, query: userMessage });
-      
       const response = await api.get(`http://localhost:8080/api/chatAI`, {
         params: {
           shopId: shopId,
           query: userMessage
         }
       });
-
-      console.log('API Response:', response.data);
 
       let botResponse = '';
       if (response.data?.response) {
@@ -56,13 +53,7 @@ export default function ChatBot({ shopId }) {
         content: botResponse || 'No response received'
       }]);
     } catch (error) {
-      console.error('Chat API Error:', {
-        error: error,
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status
-      });
-
+      console.error('Chat API Error:', error);
       setMessages(prev => [...prev, { 
         type: 'error', 
         content: `Error: ${error.response?.data?.message || error.message || 'Failed to get response'}` 
@@ -72,15 +63,25 @@ export default function ChatBot({ shopId }) {
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div className="flex flex-col h-[600px] max-h-[80vh] bg-white rounded-lg overflow-hidden">
+    <div className="fixed inset-y-0 left-0 w-96 bg-white shadow-xl flex flex-col border-r border-gray-200">
       {/* Chat Header */}
       <div className="flex-none bg-indigo-600 px-6 py-4">
-        <div className="flex items-center">
+        <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold text-white">AI Assistant</h2>
             <p className="text-sm text-white/75">Connected to Shop ID: {shopId || 'None'}</p>
           </div>
+          <button
+            onClick={onClose}
+            className="text-white/75 hover:text-white focus:outline-none"
+          >
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       </div>
 
