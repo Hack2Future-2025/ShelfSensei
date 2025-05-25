@@ -37,14 +37,14 @@ const Layout = ({ children }) => {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen flex bg-secondary-50">
+    <div className="min-h-screen flex bg-gradient-to-br from-secondary-50 to-primary-50/30">
       <div className="w-full flex">
         <Sidebar />
         <div className="flex-1 flex flex-col min-w-0">
           <Navbar />
           <main className="flex-1 p-6 lg:p-8 animate-fade-in">
             <div className="max-w-7xl mx-auto">
-              <div className="bg-white rounded-lg shadow-soft p-6">
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6">
                 {children}
               </div>
             </div>

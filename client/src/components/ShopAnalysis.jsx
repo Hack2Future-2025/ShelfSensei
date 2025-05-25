@@ -53,6 +53,14 @@ export default function ShopAnalysis({ shopId }) {
     }
   };
 
+  const getStockStatus = (product) => {
+    const stockLevel = product.current_stock;
+    if (stockLevel <= 0) return { status: 'Out of Stock', color: 'text-red-600' };
+    if (stockLevel < 5) return { status: 'Low Stock', color: 'text-yellow-600' };
+    if (stockLevel < 10) return { status: 'Moderate', color: 'text-blue-600' };
+    return { status: 'Good', color: 'text-green-600' };
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -75,14 +83,6 @@ export default function ShopAnalysis({ shopId }) {
   }
 
   if (!shopData) return null;
-
-  const getStockStatus = (product) => {
-    const stockLevel = product.current_stock;
-    if (stockLevel <= 0) return { status: 'Out of Stock', color: 'text-red-600' };
-    if (stockLevel < 5) return { status: 'Low Stock', color: 'text-yellow-600' };
-    if (stockLevel < 10) return { status: 'Moderate', color: 'text-blue-600' };
-    return { status: 'Good', color: 'text-green-600' };
-  };
 
   return (
     <div className="space-y-6">
