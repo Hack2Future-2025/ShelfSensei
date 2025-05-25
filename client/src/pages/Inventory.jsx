@@ -1,6 +1,184 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/axios';
+import { PlusIcon } from '@heroicons/react/24/outline';
+
+// Add Movement Modal Component
+const AddMovementModal = ({ show, onClose, onSubmit, vendors, products, selectedShop }) => {
+  const [formData, setFormData] = useState({
+    vendorId: '',
+    productId: '',
+    type: 'IN',
+    quantity: '',
+    price: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await onSubmit(formData);
+    setFormData({
+      vendorId: '',
+      productId: '',
+      type: 'IN',
+      quantity: '',
+      price: ''
+    });
+  };
+
+  if (!show) return null;
+
+  return (
+    <div className="fixed inset-0 overflow-y-auto h-full w-full z-50">
+      <div 
+        className="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity duration-300"
+        onClick={onClose}
+      />
+      <div className="relative min-h-screen flex items-center justify-center p-4">
+        <div 
+          className="relative bg-white/90 backdrop-blur-sm w-[600px] rounded-xl shadow-card p-8 transform transition-all duration-300 animate-scale-in"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-semibold text-gray-900 animate-slide-in-left">Add New Movement</h3>
+            <button 
+              onClick={onClose} 
+              className="text-gray-400 hover:text-gray-500 transition-colors duration-300 hover:rotate-90 transform"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Product and Vendor Selection */}
+            <div className="grid grid-cols-2 gap-6 animate-slide-in-up" style={{ animationDelay: '100ms' }}>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Product
+                  <span className="text-red-500 ml-1">*</span>
+                </label>
+                <select
+                  value={formData.productId}
+                  onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm h-10 transition-all duration-300 hover:border-indigo-400"
+                  required
+                >
+                  <option value="">Select a product</option>
+                  {products.map(product => (
+                    <option key={product.id} value={product.id}>
+                      {product.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Vendor
+                  <span className="text-red-500 ml-1">*</span>
+                </label>
+                <select
+                  value={formData.vendorId}
+                  onChange={(e) => setFormData({ ...formData, vendorId: e.target.value })}
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm h-10 transition-all duration-300 hover:border-indigo-400"
+                  required
+                >
+                  <option value="">Select a vendor</option>
+                  {vendors.map(vendor => (
+                    <option key={vendor.id} value={vendor.id}>
+                      {vendor.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Movement Details */}
+            <div className="grid grid-cols-3 gap-6 animate-slide-in-up" style={{ animationDelay: '200ms' }}>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Movement Type
+                  <span className="text-red-500 ml-1">*</span>
+                </label>
+                <div className="flex gap-4">
+                  {['IN', 'OUT'].map((type) => (
+                    <label key={type} className="inline-flex items-center">
+                      <input
+                        type="radio"
+                        value={type}
+                        checked={formData.type === type}
+                        onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                        className="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">
+                        {type}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Quantity
+                  <span className="text-red-500 ml-1">*</span>
+                </label>
+                <div className="relative rounded-md shadow-sm">
+                  <input
+                    type="number"
+                    min="1"
+                    value={formData.quantity}
+                    onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                    className="block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm h-10 transition-all duration-300 hover:border-indigo-400"
+                    placeholder="0"
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Price
+                  <span className="text-red-500 ml-1">*</span>
+                </label>
+                <div className="relative rounded-md shadow-sm">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <span className="text-gray-500 sm:text-sm">$</span>
+                  </div>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    className="block w-full rounded-md border-gray-300 pl-7 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm h-10 transition-all duration-300 hover:border-indigo-400"
+                    placeholder="0.00"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Form Actions */}
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 animate-slide-in-up" style={{ animationDelay: '300ms' }}>
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 hover:shadow-md active:scale-95"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 hover:shadow-md active:scale-95"
+              >
+                Add Movement
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 function Inventory() {
   const { user } = useAuth();
@@ -18,15 +196,9 @@ function Inventory() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [sortBy, setSortBy] = useState('id');
   const [sortOrder, setSortOrder] = useState('asc');
-  const [newInventory, setNewInventory] = useState({
-    vendorId: '',
-    productId: '',
-    type: 'IN',
-    quantity: '',
-    price: ''
-  });
   const [vendors, setVendors] = useState([]);
   const [products, setProducts] = useState([]);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   // Debounce search effect
   useEffect(() => {
@@ -155,25 +327,22 @@ function Inventory() {
     fetchVendorsAndProducts();
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleAddMovement = async (formData) => {
     if (!selectedShop) {
       setError('Please select a shop first');
       return;
     }
 
     try {
-      setError(null); // Clear any previous errors
+      setError(null);
       const payload = {
         shopId: selectedShop,
-        vendorId: parseInt(newInventory.vendorId),
-        productId: parseInt(newInventory.productId),
-        type: newInventory.type,
-        quantity: parseInt(newInventory.quantity),
-        price: parseFloat(newInventory.price)
+        vendorId: parseInt(formData.vendorId),
+        productId: parseInt(formData.productId),
+        type: formData.type,
+        quantity: parseInt(formData.quantity),
+        price: parseFloat(formData.price)
       };
-
-      console.log('Submitting inventory movement:', payload); // Debug log
 
       const response = await api.post('/api/inventory', payload);
       
@@ -189,15 +358,9 @@ function Inventory() {
         shopName: user.shops.find(s => s.id === payload.shopId)?.name
       };
       
-      setInventory(prev => [...prev, newItem]);
-      setNewInventory({
-        vendorId: '',
-        productId: '',
-        type: 'IN',
-        quantity: '',
-        price: ''
-      });
-      setError(null);
+      setInventory(prev => [newItem, ...prev]);
+      setShowAddModal(false);
+      fetchInventory(); // Refresh the list
     } catch (err) {
       console.error('Error adding inventory movement:', err);
       setError(err.response?.data?.error || err.message || 'Failed to add inventory movement');
@@ -233,57 +396,87 @@ function Inventory() {
           
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Shop Selection */}
-            <div className="min-w-[200px]">
-              <label htmlFor="shop" className="block text-sm font-medium text-gray-700 mb-1">
-                Select Shop
-              </label>
-              <select
-                id="shop"
-                value={selectedShop || ''}
-                onChange={handleShopChange}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm h-10"
-                required
-              >
-                {user?.shops?.map(shop => (
-                  <option key={shop.id} value={shop.id}>
-                    {shop.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <select
+              id="shop"
+              value={selectedShop || ''}
+              onChange={handleShopChange}
+              className="block w-[180px] rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              required
+            >
+              {user?.shops?.map(shop => (
+                <option key={shop.id} value={shop.id}>
+                  {shop.name}
+                </option>
+              ))}
+            </select>
 
-            {/* Search Input */}
-            <div className="min-w-[250px]">
-              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
-                Search Inventory
-              </label>
+            {/* Search Box */}
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clipRule="evenodd" />
+                </svg>
+              </div>
               <input
                 type="text"
+                name="search"
                 id="search"
                 value={search}
                 onChange={handleSearch}
+                className="block w-[200px] rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 placeholder="Search inventory..."
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm h-10"
               />
             </div>
+
+            {/* Add Movement Button */}
+            <button
+              type="button"
+              onClick={() => setShowAddModal(true)}
+              className="inline-flex items-center gap-x-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+              <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
+              Add Movement
+            </button>
           </div>
         </div>
       </div>
+
+      {error && (
+        <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
             <tr className="bg-gray-50">
-              {['Product', 'Shop', 'Vendor', 'Type', 'Quantity', 'Price'].map(header => (
+              {[
+                { label: 'Product', key: 'productName' },
+                { label: 'Shop', key: 'shopName' },
+                { label: 'Vendor', key: 'vendorName' },
+                { label: 'Type', key: 'type' },
+                { label: 'Quantity', key: 'quantity' },
+                { label: 'Price', key: 'price' }
+              ].map(({ label, key }) => (
                 <th
-                  key={header.toLowerCase()}
-                  onClick={() => handleSort(header.toLowerCase())}
-                  className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-150"
+                  key={key}
+                  onClick={() => handleSort(key)}
+                  className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-150 group"
                 >
                   <div className="flex items-center space-x-1">
-                    <span>{header}</span>
+                    <span>{label}</span>
                     <span className="text-gray-400">
-                      {sortBy === header.toLowerCase() ? (
+                      {sortBy === key ? (
                         sortOrder === 'asc' ? '↑' : '↓'
                       ) : (
                         <span className="opacity-0 group-hover:opacity-50">↕</span>
@@ -347,13 +540,13 @@ function Inventory() {
 
         {inventory.length === 0 && (
           <div className="text-center py-6 text-gray-500">
-            No inventory items found
+            {search ? 'No results found' : 'No inventory items found'}
           </div>
         )}
       </div>
 
       {/* Pagination */}
-      <div className="mt-4 flex items-center justify-between bg-white px-4 py-3 rounded-lg shadow-sm border border-gray-200">
+      <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white px-4 py-3 rounded-lg shadow-sm border border-gray-200">
         <div className="flex items-center text-sm text-gray-700">
           <span className="font-medium">{((pagination.page - 1) * pagination.limit) + 1}</span>
           <span className="mx-1">-</span>
@@ -363,6 +556,21 @@ function Inventory() {
           <span className="mx-1">of</span>
           <span className="font-medium">{pagination.total}</span>
           <span className="ml-1">items</span>
+        </div>
+        <div className="flex flex-wrap justify-center gap-2">
+          {[...Array(pagination.totalPages)].map((_, index) => (
+            <button
+              key={index + 1}
+              onClick={() => setPagination(prev => ({ ...prev, page: index + 1 }))}
+              className={`inline-flex items-center px-3 py-1.5 border text-sm font-medium rounded-md ${
+                pagination.page === index + 1
+                  ? 'bg-indigo-50 border-indigo-500 text-indigo-600'
+                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-150`}
+            >
+              {index + 1}
+            </button>
+          ))}
         </div>
         <div className="flex gap-2">
           <button
@@ -382,109 +590,15 @@ function Inventory() {
         </div>
       </div>
 
-      {/* Add Inventory Movement Form */}
-      <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow mt-8">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="vendor" className="block text-sm font-medium text-gray-700">
-              Vendor
-            </label>
-            <select
-              id="vendor"
-              value={newInventory.vendorId}
-              onChange={(e) => setNewInventory({ ...newInventory, vendorId: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              required
-            >
-              <option value="">Select a vendor</option>
-              {vendors.map((vendor) => (
-                <option key={vendor.id} value={vendor.id}>
-                  {vendor.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="product" className="block text-sm font-medium text-gray-700">
-              Product
-            </label>
-            <select
-              id="product"
-              value={newInventory.productId}
-              onChange={(e) => setNewInventory({ ...newInventory, productId: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              required
-            >
-              <option value="">Select a product</option>
-              {products.map((product) => (
-                <option key={product.id} value={product.id}>
-                  {product.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="type" className="block text-sm font-medium text-gray-700">
-              Movement Type
-            </label>
-            <select
-              id="type"
-              value={newInventory.type}
-              onChange={(e) => setNewInventory({ ...newInventory, type: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              required
-            >
-              <option value="IN">IN</option>
-              <option value="OUT">OUT</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="quantity" className="block text-sm font-medium text-gray-700">
-              Quantity
-            </label>
-            <input
-              type="number"
-              id="quantity"
-              min="1"
-              value={newInventory.quantity}
-              onChange={(e) => setNewInventory({ ...newInventory, quantity: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              required
-            />
-          </div>
-
-          <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-              Price
-            </label>
-            <input
-              type="number"
-              id="price"
-              min="0"
-              step="0.01"
-              value={newInventory.price}
-              onChange={(e) => setNewInventory({ ...newInventory, price: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              required
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <button
-            type="submit"
-            className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-          >
-            Add Movement
-          </button>
-          {error && (
-            <p className="text-sm text-red-600">{error}</p>
-          )}
-        </div>
-      </form>
+      {/* Add Movement Modal */}
+      <AddMovementModal
+        show={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSubmit={handleAddMovement}
+        vendors={vendors}
+        products={products}
+        selectedShop={selectedShop}
+      />
     </div>
   );
 }
