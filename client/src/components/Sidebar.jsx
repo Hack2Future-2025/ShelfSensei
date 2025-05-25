@@ -33,7 +33,7 @@ export default function Sidebar() {
   return (
     <div 
       className={classNames(
-        'hidden md:block bg-gray-800 h-full',
+        'hidden md:block bg-primary-800 h-full transition-all duration-300 ease-in-out border-r border-primary-700/50',
         isCollapsed ? 'w-16' : 'w-64'
       )}
     >
@@ -41,12 +41,12 @@ export default function Sidebar() {
         <div className="flex items-center justify-end px-4 py-4">
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1 rounded-md text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+            className="p-1.5 rounded-md text-primary-200 hover:bg-primary-700/50 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-400 transition-all duration-200"
           >
             {isCollapsed ? (
-              <ChevronRightIcon className="h-6 w-6" aria-hidden="true" />
+              <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
             ) : (
-              <ChevronLeftIcon className="h-6 w-6" aria-hidden="true" />
+              <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
             )}
           </button>
         </div>
@@ -59,21 +59,29 @@ export default function Sidebar() {
                 to={item.href}
                 className={classNames(
                   current
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                  'group flex items-center px-2 py-2 text-sm font-medium rounded-md'
+                    ? 'bg-primary-900/60 text-white shadow-sm'
+                    : 'text-primary-100 hover:bg-primary-700/50 hover:text-white',
+                  'group flex items-center px-3 py-2.5 text-sm font-medium rounded-md transition-all duration-200',
+                  !isCollapsed && 'backdrop-blur-sm'
                 )}
                 title={isCollapsed ? item.name : undefined}
               >
                 <item.icon
                   className={classNames(
-                    current ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300',
-                    'flex-shrink-0 h-6 w-6',
+                    current ? 'text-primary-200' : 'text-primary-300 group-hover:text-primary-100',
+                    'flex-shrink-0 h-5 w-5 transition-colors duration-200',
                     isCollapsed ? '' : 'mr-3'
                   )}
                   aria-hidden="true"
                 />
-                {!isCollapsed && <span className="text-gray-300">{item.name}</span>}
+                {!isCollapsed && (
+                  <span className={classNames(
+                    current ? 'text-white' : 'text-primary-100',
+                    'transition-colors duration-200'
+                  )}>
+                    {item.name}
+                  </span>
+                )}
               </Link>
             );
           })}

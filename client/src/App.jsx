@@ -10,6 +10,7 @@ import Inventory from './pages/Inventory';
 import Forecasting from './pages/Forecasting';
 import Observations from './pages/Observations';
 import Login from './pages/Login';
+import IdleTimeoutDialog from './components/IdleTimeoutDialog';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -33,15 +34,24 @@ const ProtectedRoute = ({ children }) => {
 
 // Layout component with Navbar and Sidebar
 const Layout = ({ children }) => {
+  const { user } = useAuth();
+
   return (
-    <div className="h-screen flex flex-col">
-      <Navbar />
-      <div className="flex-1 flex">
+    <div className="min-h-screen flex bg-secondary-50">
+      <div className="w-full flex">
         <Sidebar />
-        <main className="flex-1 overflow-auto p-8 bg-gray-100">
-          {children}
-        </main>
+        <div className="flex-1 flex flex-col min-w-0">
+          <Navbar />
+          <main className="flex-1 p-6 lg:p-8 animate-fade-in">
+            <div className="max-w-7xl mx-auto">
+              <div className="bg-white rounded-lg shadow-soft p-6">
+                {children}
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
+      {user && <IdleTimeoutDialog />}
     </div>
   );
 };
