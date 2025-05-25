@@ -1,0 +1,170 @@
+import { useState, useRef, useEffect } from 'react';
+import api from '../utils/axios';
+
+export default function ChatBot({ shopId }) {
+  const [messages, setMessages] = useState([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // Focus input when chat opens
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!inputMessage.trim()) return;
+
+    const userMessage = inputMessage.trim();
+    setMessages(prev => [...prev, { type: 'user', content: userMessage }]);
+    setInputMessage('');
+    setIsLoading(true);
+
+    try {
+      console.log('Sending request with:', { shopId, query: userMessage });
+      
+      const response = await api.get(`http://localhost:8080/api/chatAI`, {
+        params: {
+          shopId: shopId,
+          query: userMessage
+        }
+      });
+
+      console.log('API Response:', response.data);
+
+      let botResponse = '';
+      if (response.data?.response) {
+        botResponse = response.data.response;
+      } else if (typeof response.data === 'string') {
+        botResponse = response.data;
+      } else {
+        botResponse = JSON.stringify(response.data);
+      }
+
+      setMessages(prev => [...prev, { 
+        type: 'bot', 
+        content: botResponse || 'No response received'
+      }]);
+    } catch (error) {
+      console.error('Chat API Error:', {
+        error: error,
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+
+      setMessages(prev => [...prev, { 
+        type: 'error', 
+        content: `Error: ${error.response?.data?.message || error.message || 'Failed to get response'}` 
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-[80vh] max-h-[800px] bg-white">
+      {/* Chat Header */}
+      <div className="px-6 py-4 bg-indigo-600">
+        <h2 className="text-xl font-semibold text-white">AI Assistant</h2>
+        <p className="text-sm text-white opacity-75">Connected to Shop ID: {shopId || 'None'}</p>
+      </div>
+
+      {/* Messages Container */}
+      <div className="flex-1 p-4 overflow-y-auto">
+        {messages.length === 0 && (
+          <div className="text-center text-gray-500 mt-4">
+            <svg 
+              className="mx-auto h-12 w-12 text-gray-400" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={1.5}
+                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+              />
+            </svg>
+            <p className="mt-2">Start a conversation by sending a message!</p>
+            <p className="text-sm mt-1">Ask about sales forecasts, trends, or recommendations.</p>
+          </div>
+        )}
+        
+        {messages.map((message, index) => (
+          <div
+            key={index}
+            className={`mb-4 ${
+              message.type === 'user' ? 'flex justify-end' : 'flex justify-start'
+            }`}
+          >
+            <div
+              className={`max-w-[70%] rounded-lg px-4 py-2 ${
+                message.type === 'user'
+                  ? 'bg-indigo-600 text-white'
+                  : message.type === 'error'
+                  ? 'bg-red-100 text-red-700'
+                  : 'bg-gray-100 text-gray-800'
+              }`}
+            >
+              <div className="text-xs opacity-75 mb-1">
+                {message.type === 'user' ? 'You' : message.type === 'error' ? 'Error' : 'AI Assistant'}
+              </div>
+              <div className="whitespace-pre-wrap">{message.content}</div>
+            </div>
+          </div>
+        ))}
+        
+        {isLoading && (
+          <div className="flex justify-start mb-4">
+            <div className="bg-gray-100 rounded-lg px-4 py-2">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input Form */}
+      <form onSubmit={handleSubmit} className="p-4 border-t">
+        <div className="flex space-x-4">
+          <input
+            ref={inputRef}
+            type="text"
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            placeholder="Type your message..."
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            disabled={isLoading || !shopId}
+          />
+          <button
+            type="submit"
+            disabled={isLoading || !inputMessage.trim() || !shopId}
+            className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Send
+          </button>
+        </div>
+        {!shopId && (
+          <p className="text-sm text-red-500 mt-2">Please select a shop to start chatting</p>
+        )}
+      </form>
+    </div>
+  );
+} 

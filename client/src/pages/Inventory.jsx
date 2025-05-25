@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/axios';
 
-export default function Inventory() {
+function Inventory() {
   const { user } = useAuth();
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,6 +15,7 @@ export default function Inventory() {
     totalPages: 0
   });
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [sortBy, setSortBy] = useState('id');
   const [sortOrder, setSortOrder] = useState('asc');
   const [newInventory, setNewInventory] = useState({
@@ -26,6 +27,15 @@ export default function Inventory() {
   });
   const [vendors, setVendors] = useState([]);
   const [products, setProducts] = useState([]);
+
+  // Debounce search effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   useEffect(() => {
     // Set default selected shop to first shop in user's shops
@@ -57,38 +67,31 @@ export default function Inventory() {
       const params = {
         page: pagination.page,
         limit: pagination.limit,
-        search,
+        search: debouncedSearch,
         sortBy,
         sortOrder,
         userId: user.id,
-        shopId: selectedShop // Always include shopId since "All Shops" option is removed
+        shopId: selectedShop
       };
 
       const response = await api.get('/api/inventory', { params });
       
-      // Check if response and response.data exist
       if (!response || !response.data) {
         throw new Error('Invalid response from server');
       }
 
-      // Set inventory with fallback to empty array
       setInventory(response.data.data || []);
-      
-      // Set pagination with fallback values
       setPagination({
         page: response.data.pagination?.page || 1,
         limit: response.data.pagination?.limit || 10,
         total: response.data.pagination?.total || 0,
         totalPages: response.data.pagination?.totalPages || 0
       });
-
-      // Set additional data with fallbacks
       setVendors(response.data.vendors || []);
       setProducts(response.data.products || []);
     } catch (err) {
       console.error('Error fetching inventory:', err);
       setError(err.response?.data?.error || err.message || 'Failed to fetch inventory');
-      // Reset data on error
       setInventory([]);
       setPagination({
         page: 1,
@@ -102,15 +105,14 @@ export default function Inventory() {
   };
 
   useEffect(() => {
-    // Only fetch if user exists
     if (user?.id) {
       fetchInventory();
     }
-  }, [pagination.page, pagination.limit, search, sortBy, sortOrder, selectedShop, user?.id]);
+  }, [pagination.page, pagination.limit, debouncedSearch, sortBy, sortOrder, selectedShop, user?.id]);
 
   const handleShopChange = (e) => {
     setSelectedShop(parseInt(e.target.value));
-    setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page when changing shop
+    setPagination(prev => ({ ...prev, page: 1 }));
   };
 
   const handleSort = (field) => {
@@ -123,9 +125,35 @@ export default function Inventory() {
   };
 
   const handleSearch = (e) => {
-    setSearch(e.target.value);
-    setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page when searching
+    const value = e.target.value;
+    setSearch(value);
+    setPagination(prev => ({ ...prev, page: 1 }));
   };
+
+  // Add separate functions to fetch vendors and products
+  const fetchVendorsAndProducts = async () => {
+    try {
+      const [vendorsResponse, productsResponse] = await Promise.all([
+        api.get('/api/vendors'),
+        api.get('/api/products')
+      ]);
+
+      if (vendorsResponse?.data) {
+        setVendors(vendorsResponse.data.data || []);
+      }
+      if (productsResponse?.data) {
+        setProducts(productsResponse.data.data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching vendors and products:', err);
+      setError('Failed to load vendors and products');
+    }
+  };
+
+  // Add effect to fetch vendors and products on mount
+  useEffect(() => {
+    fetchVendorsAndProducts();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -135,21 +163,33 @@ export default function Inventory() {
     }
 
     try {
-      const response = await api.post('/api/inventory', {
+      setError(null); // Clear any previous errors
+      const payload = {
         shopId: selectedShop,
         vendorId: parseInt(newInventory.vendorId),
         productId: parseInt(newInventory.productId),
         type: newInventory.type,
         quantity: parseInt(newInventory.quantity),
         price: parseFloat(newInventory.price)
-      });
+      };
+
+      console.log('Submitting inventory movement:', payload); // Debug log
+
+      const response = await api.post('/api/inventory', payload);
       
+      if (!response?.data) {
+        throw new Error('Invalid response from server');
+      }
+
       const newItem = {
         ...response.data,
-        price: Number(response.data.price)
+        price: Number(response.data.price),
+        productName: products.find(p => p.id === payload.productId)?.name,
+        vendorName: vendors.find(v => v.id === payload.vendorId)?.name,
+        shopName: user.shops.find(s => s.id === payload.shopId)?.name
       };
       
-      setInventory([...inventory, newItem]);
+      setInventory(prev => [...prev, newItem]);
       setNewInventory({
         vendorId: '',
         productId: '',
@@ -157,8 +197,10 @@ export default function Inventory() {
         quantity: '',
         price: ''
       });
+      setError(null);
     } catch (err) {
-      setError(err.response?.data?.error || err.message || 'Failed to add inventory');
+      console.error('Error adding inventory movement:', err);
+      setError(err.response?.data?.error || err.message || 'Failed to add inventory movement');
     }
   };
 
@@ -185,32 +227,46 @@ export default function Inventory() {
 
   return (
     <div className="container mx-auto px-4">
-      <div className="mb-6 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Inventory Management</h1>
-        
-        <div className="flex gap-4">
-          {/* Shop Selection */}
-          <select
-            value={selectedShop || ''}
-            onChange={handleShopChange}
-            className="block w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            required
-          >
-            {user?.shops?.map(shop => (
-              <option key={shop.id} value={shop.id}>
-                {shop.name}
-              </option>
-            ))}
-          </select>
+      <div className="mb-8 bg-white p-6 rounded-lg shadow">
+        <div className="flex flex-col sm:flex-row justify-between gap-6">
+          <h1 className="text-2xl font-bold text-gray-900">Inventory Management</h1>
+          
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Shop Selection */}
+            <div className="min-w-[200px]">
+              <label htmlFor="shop" className="block text-sm font-medium text-gray-700 mb-1">
+                Select Shop
+              </label>
+              <select
+                id="shop"
+                value={selectedShop || ''}
+                onChange={handleShopChange}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm h-10"
+                required
+              >
+                {user?.shops?.map(shop => (
+                  <option key={shop.id} value={shop.id}>
+                    {shop.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          {/* Search Input */}
-          <input
-            type="text"
-            placeholder="Search inventory..."
-            value={search}
-            onChange={handleSearch}
-            className="block w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
+            {/* Search Input */}
+            <div className="min-w-[250px]">
+              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+                Search Inventory
+              </label>
+              <input
+                type="text"
+                id="search"
+                value={search}
+                onChange={handleSearch}
+                placeholder="Search inventory..."
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm h-10"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -336,12 +392,12 @@ export default function Inventory() {
             <select
               id="vendor"
               value={newInventory.vendorId}
-              onChange={(e) => setNewInventory({ ...newInventory, vendorId: parseInt(e.target.value) })}
+              onChange={(e) => setNewInventory({ ...newInventory, vendorId: e.target.value })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               required
             >
               <option value="">Select a vendor</option>
-              {Array.isArray(vendors) && vendors.map((vendor) => (
+              {vendors.map((vendor) => (
                 <option key={vendor.id} value={vendor.id}>
                   {vendor.name}
                 </option>
@@ -356,12 +412,12 @@ export default function Inventory() {
             <select
               id="product"
               value={newInventory.productId}
-              onChange={(e) => setNewInventory({ ...newInventory, productId: parseInt(e.target.value) })}
+              onChange={(e) => setNewInventory({ ...newInventory, productId: e.target.value })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               required
             >
               <option value="">Select a product</option>
-              {Array.isArray(products) && products.map((product) => (
+              {products.map((product) => (
                 <option key={product.id} value={product.id}>
                   {product.name}
                 </option>
@@ -417,13 +473,20 @@ export default function Inventory() {
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        >
-          Add Movement
-        </button>
+        <div className="flex items-center justify-between">
+          <button
+            type="submit"
+            className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          >
+            Add Movement
+          </button>
+          {error && (
+            <p className="text-sm text-red-600">{error}</p>
+          )}
+        </div>
       </form>
     </div>
   );
-} 
+}
+
+export default Inventory; 

@@ -8,6 +8,239 @@ import {
 } from '../components/Layout';
 import { PlusIcon, Squares2X2Icon, ListBulletIcon } from '@heroicons/react/24/outline';
 
+// Separate AddProductModal component
+const AddProductModal = ({ show, onClose, onSubmit, categories }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    categoryId: '',
+    price: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await onSubmit(formData);
+    setFormData({ name: '', categoryId: '', price: '' });
+  };
+
+  if (!show) return null;
+
+  return (
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium">Add New Product</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
+            <span className="text-2xl">&times;</span>
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="mt-1 block w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="Enter product name"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Category</label>
+            <select
+              value={formData.categoryId}
+              onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+              className="mt-1 block w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="">Select category</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Price</label>
+            <div className="mt-1 relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span className="text-gray-500 sm:text-sm">$</span>
+              </div>
+              <input
+                type="number"
+                value={formData.price}
+                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                className="pl-7 block w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder="0.00"
+                step="0.01"
+                min="0"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end space-x-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md"
+            >
+              Add Product
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// Edit Product Modal Component
+const EditProductModal = ({ show, onClose, onSubmit, product, categories }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    categoryId: '',
+    price: ''
+  });
+
+  useEffect(() => {
+    if (product) {
+      setFormData({
+        name: product.name,
+        categoryId: product.cat_id || '',
+        price: product.price
+      });
+    }
+  }, [product]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await onSubmit(formData);
+  };
+
+  if (!show) return null;
+
+  return (
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium">Edit Product</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
+            <span className="text-2xl">&times;</span>
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="mt-1 block w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="Enter product name"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Category</label>
+            <select
+              value={formData.categoryId}
+              onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+              className="mt-1 block w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="">Select category</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Price</label>
+            <div className="mt-1 relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span className="text-gray-500 sm:text-sm">$</span>
+              </div>
+              <input
+                type="number"
+                value={formData.price}
+                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                className="pl-7 block w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder="0.00"
+                step="0.01"
+                min="0"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end space-x-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// View Product Modal Component
+const ViewProductModal = ({ show, onClose, product }) => {
+  if (!show || !product) return null;
+
+  return (
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium">Product Details</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
+            <span className="text-2xl">&times;</span>
+          </button>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <h4 className="text-sm font-medium text-gray-500">Product Name</h4>
+            <p className="mt-1 text-sm text-gray-900">{product.name}</p>
+          </div>
+          <div>
+            <h4 className="text-sm font-medium text-gray-500">Category</h4>
+            <p className="mt-1 text-sm text-gray-900">{product.category?.name || 'Uncategorized'}</p>
+          </div>
+          <div>
+            <h4 className="text-sm font-medium text-gray-500">Price</h4>
+            <p className="mt-1 text-sm text-gray-900">${Number(product.price).toFixed(2)}</p>
+          </div>
+          <div>
+            <h4 className="text-sm font-medium text-gray-500">Product ID</h4>
+            <p className="mt-1 text-sm text-gray-900">#{product.id}</p>
+          </div>
+          <div className="flex justify-end">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function Products() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,11 +256,9 @@ export default function Products() {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [newProduct, setNewProduct] = useState({
-    name: '',
-    categoryId: '',
-    price: ''
-  });
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
 
   const fetchProducts = async () => {
     try {
@@ -70,15 +301,13 @@ export default function Products() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleAddProduct = async (formData) => {
     try {
       await axios.post('http://localhost:5000/api/products', {
-        name: newProduct.name,
-        cat_id: parseInt(newProduct.categoryId),
-        price: parseFloat(newProduct.price)
+        name: formData.name,
+        cat_id: formData.categoryId ? parseInt(formData.categoryId) : null,
+        price: formData.price ? parseFloat(formData.price) : 0
       });
-      setNewProduct({ name: '', categoryId: '', price: '' });
       setShowAddModal(false);
       fetchProducts();
     } catch (err) {
@@ -86,79 +315,30 @@ export default function Products() {
     }
   };
 
-  const AddProductModal = () => (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium">Add New Product</h3>
-          <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-gray-500">
-            <span className="text-2xl">&times;</span>
-          </button>
-        </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Name</label>
-            <input
-              type="text"
-              value={newProduct.name}
-              onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Category</label>
-            <select
-              value={newProduct.categoryId}
-              onChange={(e) => setNewProduct({ ...newProduct, categoryId: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              required
-            >
-              <option value="">Select category</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Price</label>
-            <div className="mt-1 relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span className="text-gray-500 sm:text-sm">$</span>
-              </div>
-              <input
-                type="number"
-                value={newProduct.price}
-                onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
-                className="pl-7 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                placeholder="0.00"
-                step="0.01"
-                min="0"
-                required
-              />
-            </div>
-          </div>
-          <div className="flex justify-end space-x-3">
-            <button
-              type="button"
-              onClick={() => setShowAddModal(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md"
-            >
-              Add Product
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+  const handleEditProduct = async (formData) => {
+    try {
+      await axios.put(`http://localhost:5000/api/products/${selectedProduct.id}`, {
+        name: formData.name,
+        cat_id: formData.categoryId ? parseInt(formData.categoryId) : null,
+        price: formData.price ? parseFloat(formData.price) : 0
+      });
+      setShowEditModal(false);
+      setSelectedProduct(null);
+      fetchProducts();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleEdit = (product) => {
+    setSelectedProduct(product);
+    setShowEditModal(true);
+  };
+
+  const handleView = (product) => {
+    setSelectedProduct(product);
+    setShowViewModal(true);
+  };
 
   const ProductGrid = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -176,10 +356,16 @@ export default function Products() {
               <span className="text-xs text-gray-500">ID: #{product.id}</span>
             </div>
             <div className="mt-4 flex space-x-2">
-              <button className="flex-1 px-3 py-1 text-sm text-indigo-600 hover:text-indigo-700 border border-indigo-600 rounded-md hover:bg-indigo-50">
+              <button 
+                onClick={() => handleEdit(product)}
+                className="flex-1 px-3 py-1 text-sm text-indigo-600 hover:text-indigo-700 border border-indigo-600 rounded-md hover:bg-indigo-50"
+              >
                 Edit
               </button>
-              <button className="flex-1 px-3 py-1 text-sm text-white bg-indigo-600 hover:bg-indigo-700 rounded-md">
+              <button 
+                onClick={() => handleView(product)}
+                className="flex-1 px-3 py-1 text-sm text-white bg-indigo-600 hover:bg-indigo-700 rounded-md"
+              >
                 View Details
               </button>
             </div>
@@ -228,8 +414,18 @@ export default function Products() {
                 ${Number(product.price).toFixed(2)}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button className="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
-                <button className="text-indigo-600 hover:text-indigo-900">View</button>
+                <button 
+                  onClick={() => handleEdit(product)} 
+                  className="text-indigo-600 hover:text-indigo-900 mr-3"
+                >
+                  Edit
+                </button>
+                <button 
+                  onClick={() => handleView(product)}
+                  className="text-indigo-600 hover:text-indigo-900"
+                >
+                  View
+                </button>
               </td>
             </tr>
           ))}
@@ -337,7 +533,32 @@ export default function Products() {
         />
       </div>
 
-      {showAddModal && <AddProductModal />}
+      <AddProductModal 
+        show={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSubmit={handleAddProduct}
+        categories={categories}
+      />
+
+      <EditProductModal 
+        show={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setSelectedProduct(null);
+        }}
+        onSubmit={handleEditProduct}
+        product={selectedProduct}
+        categories={categories}
+      />
+
+      <ViewProductModal 
+        show={showViewModal}
+        onClose={() => {
+          setShowViewModal(false);
+          setSelectedProduct(null);
+        }}
+        product={selectedProduct}
+      />
     </div>
   );
 } 

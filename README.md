@@ -1,104 +1,125 @@
-# Inventory Management System
+# 🎯 ShelfSensei - Inventory Intelligence
 
-A full-stack inventory management application built with React, Express.js, and PostgreSQL.
+ShelfSensei is a modern, intelligent inventory management system that combines real-time tracking with predictive analytics to help businesses make smarter inventory decisions. Like a wise master of inventory management, it guides you through your stock trends and forecasts future needs with precision.
 
-## Features
+## ✨ Features
 
-- Dashboard with real-time statistics and charts
-- Product management with categories
-- Vendor management
-- Inventory tracking
-- Low stock alerts
-- Beautiful UI with Tailwind CSS
+- **Smart Forecasting**: Advanced predictive analytics for inventory trends
+- **Multi-Shop Management**: Centralized control for multiple locations
+- **Real-time Analytics**: Live tracking and visualization of inventory movements
+- **Product Performance**: Detailed analysis of top-moving products
+- **Interactive Dashboards**: Beautiful, responsive UI with real-time updates
+- **Confidence Metrics**: Statistical reliability indicators for forecasts
 
-## Prerequisites
+## 🚀 Tech Stack
 
-- Node.js 20.x
-- PostgreSQL 14+
-- npm or yarn
+### Frontend
+- React 18
+- Chart.js & Recharts for data visualization
+- TailwindCSS for styling
+- Vite for build tooling
+- Heroicons for UI elements
 
-## Setup Instructions
+### Backend
+- Node.js with Express
+- Prisma ORM
+- JWT for authentication
+- PostgreSQL database
 
-### Database Setup
+## 📦 Installation
 
-1. Create a PostgreSQL database
-2. Update the `.env` file in the server directory with your database credentials:
-
-```env
-DATABASE_URL="postgresql://username:password@localhost:5432/inventory_db"
+1. Clone the repository:
+```bash
+git clone https://github.com/Hack2Future-2025/ShelfSensei
+cd shelfsensei
 ```
 
-### Backend Setup
+2. Install dependencies:
+```bash
+# Install server dependencies
+cd server
+npm install
 
-1. Navigate to the server directory:
+# Install client dependencies
+cd ../client
+npm install
+```
+
+3. Set up environment variables:
+```bash
+# In server directory
+cp .env.example .env
+# Edit .env with your database credentials
+```
+
+4. Initialize the database:
 ```bash
 cd server
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Initialize Prisma and run migrations:
-```bash
 npx prisma migrate dev
+npx prisma db seed
 ```
 
-4. Start the server:
+## 🏃‍♂️ Running the Application
+
+1. Start the server:
 ```bash
+cd server
 npm run dev
 ```
 
-The server will start on http://localhost:5000
-
-### Frontend Setup
-
-1. Navigate to the client directory:
+2. Start the client:
 ```bash
 cd client
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Start the development server:
-```bash
 npm run dev
 ```
 
-The client will start on http://localhost:5173
+The application will be available at `http://localhost:5173`
 
-## Project Structure
+## 📊 Key Features Breakdown
 
-```
-.
-├── client/                 # React frontend
-│   ├── src/
-│   │   ├── components/    # Reusable components
-│   │   ├── pages/        # Page components
-│   │   └── App.jsx       # Main application component
-│   └── package.json
-│
-└── server/                # Express.js backend
-    ├── src/
-    │   ├── routes/       # API routes
-    │   ├── controllers/  # Route controllers
-    │   └── index.js      # Server entry point
-    ├── prisma/           # Database schema and migrations
-    └── package.json
-```
+### Inventory Forecasting
+- Historical trend analysis
+- Machine learning-based predictions
+- Confidence interval calculations
+- Seasonal adjustment factors
 
-## API Endpoints
+### Shop Management
+- Multi-location inventory tracking
+- Stock level monitoring
+- Movement history
+- Performance metrics
 
-- `GET /api/dashboard/stats` - Get dashboard statistics
-- `GET /api/categories` - List all categories
-- `POST /api/categories` - Create a new category
-- `GET /api/products` - List all products
-- `POST /api/products` - Create a new product
-- `GET /api/vendors` - List all vendors
-- `POST /api/vendors` - Create a new vendor
-- `GET /api/inventory` - List inventory items
-- `POST /api/inventory` - Add inventory movement 
+### Product Analytics
+- Top-moving products identification
+- Stock turnover rates
+- Reorder point calculations
+- Demand pattern analysis
+
+## 🔒 Security
+
+- JWT-based authentication
+- Role-based access control
+- Secure API endpoints
+- Input validation and sanitization
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
+## 📝 License
+
+This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with modern web technologies
+- Inspired by the need for intelligent inventory management
+- Powered by data-driven decision making
+
+## 📫 Support
+
+For support, please open an issue in the GitHub repository or contact our support team.
+
+---
+
+Made with ❤️ by the ShelfSensei Team 

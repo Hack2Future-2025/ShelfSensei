@@ -98,7 +98,8 @@ router.post('/', async (req, res) => {
     const product = await prisma.product.create({
       data: {
         name: req.body.name,
-        categoryId: req.body.categoryId ? parseInt(req.body.categoryId) : null
+        cat_id: req.body.cat_id ? parseInt(req.body.cat_id) : null,
+        price: req.body.price ? parseFloat(req.body.price) : 0
       },
       include: {
         category: true
@@ -117,7 +118,8 @@ router.put('/:id', async (req, res) => {
       where: { id: parseInt(req.params.id) },
       data: {
         name: req.body.name,
-        categoryId: req.body.categoryId ? parseInt(req.body.categoryId) : null
+        cat_id: req.body.cat_id ? parseInt(req.body.cat_id) : null,
+        price: req.body.price ? parseFloat(req.body.price) : 0
       },
       include: {
         category: true

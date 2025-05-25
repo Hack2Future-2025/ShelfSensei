@@ -8,6 +8,7 @@ import Categories from './pages/Categories';
 import Vendors from './pages/Vendors';
 import Inventory from './pages/Inventory';
 import Forecasting from './pages/Forecasting';
+import Observations from './pages/Observations';
 import Login from './pages/Login';
 
 // Protected Route component
@@ -33,11 +34,11 @@ const ProtectedRoute = ({ children }) => {
 // Layout component with Navbar and Sidebar
 const Layout = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="h-screen flex flex-col">
       <Navbar />
-      <div className="flex">
+      <div className="flex-1 flex">
         <Sidebar />
-        <main className="flex-1 p-8">
+        <main className="flex-1 overflow-auto p-8 bg-gray-100">
           {children}
         </main>
       </div>
@@ -113,6 +114,17 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <Forecasting />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/observations"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Observations />
                 </Layout>
               </ProtectedRoute>
             }

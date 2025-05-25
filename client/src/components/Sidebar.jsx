@@ -9,6 +9,7 @@ import {
   ChartBarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ChartPieIcon,
 } from '@heroicons/react/24/outline';
 
 const navigation = [
@@ -18,6 +19,7 @@ const navigation = [
   { name: 'Vendors', href: '/vendors', icon: UserGroupIcon },
   { name: 'Inventory', href: '/inventory', icon: ClipboardDocumentListIcon },
   { name: 'Forecasting', href: '/forecasting', icon: ChartBarIcon },
+  { name: 'Observations', href: '/observations', icon: ChartPieIcon },
 ];
 
 function classNames(...classes) {
@@ -31,12 +33,12 @@ export default function Sidebar() {
   return (
     <div 
       className={classNames(
-        'hidden md:flex md:flex-col bg-gray-800 transition-all duration-300 ease-in-out',
-        isCollapsed ? 'md:w-16' : 'md:w-64'
+        'hidden md:block bg-gray-800 h-full',
+        isCollapsed ? 'w-16' : 'w-64'
       )}
     >
-      <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
-        <div className="flex items-center justify-end px-4">
+      <div className="h-full flex flex-col">
+        <div className="flex items-center justify-end px-4 py-4">
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="p-1 rounded-md text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
@@ -48,7 +50,7 @@ export default function Sidebar() {
             )}
           </button>
         </div>
-        <nav className="mt-5 flex-1 space-y-1 px-2">
+        <nav className="flex-1 px-2 pb-4 overflow-y-auto space-y-1">
           {navigation.map((item) => {
             const current = location.pathname === item.href;
             return (

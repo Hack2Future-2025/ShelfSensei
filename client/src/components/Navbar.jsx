@@ -18,10 +18,10 @@ export default function Navbar() {
   const location = useLocation();
 
   return (
-    <Disclosure as="nav" className="bg-gray-800">
+    <Disclosure as="nav" className="bg-gray-800 z-50">
       {({ open }) => (
         <>
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="w-full px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 items-center justify-between">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -99,7 +99,7 @@ export default function Navbar() {
           </div>
 
           {/* Mobile menu panel */}
-          <Disclosure.Panel className="md:hidden">
+          <Disclosure.Panel className="md:hidden fixed w-full bg-gray-800 shadow-lg">
             <div className="space-y-1 px-2 pb-3 pt-2">
               {navigation.map((item) => {
                 const current = location.pathname === item.href;
