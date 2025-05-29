@@ -61,12 +61,14 @@ const AddCategoryModal = ({ show, onClose, onSubmit }) => {
 // Edit Category Modal Component
 const EditCategoryModal = ({ show, onClose, onSubmit, category }) => {
   const [formData, setFormData] = useState({
+    id:null,
     name: ''
   });
 
   useEffect(() => {
     if (category) {
       setFormData({
+        id:category.id,
         name: category.name
       });
     }
@@ -244,7 +246,8 @@ export default function Categories() {
   const handleAddCategory = async (name) => {
     try {
       setError(null);
-      const response = await api.post('/api/categories', { name });
+      const response = await api.post('/api/categories', { name:name.name
+       });
       
       if (response.data && response.data.id) {
         setShowAddModal(false);
@@ -261,7 +264,7 @@ export default function Categories() {
   const handleEditCategory = async (id, name) => {
     try {
       setError(null);
-      const response = await api.put(`/api/categories/${id}`, { name });
+      const response = await api.put(`/api/categories/${id.id}`, { name:id.name });
       
       if (response.data && response.data.id) {
         setSelectedCategory(null);
