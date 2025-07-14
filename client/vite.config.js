@@ -10,7 +10,7 @@ export default defineConfig({
     allowedHosts: ['*'], // this allows any hostname to access dev server
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://65.2.183.147:5000',
         changeOrigin: true,
         secure: false,
       },

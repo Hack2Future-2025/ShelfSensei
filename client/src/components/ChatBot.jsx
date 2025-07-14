@@ -39,7 +39,7 @@ export default function ChatBot({ shopId, isOpen, onClose }) {
     setIsLoading(true);
 
     try {
-      const response = await api.get(`http://localhost:8080/api/chatAI`, {
+      const response = await api.get(`http://http://65.2.183.147:8080/api/chatAI`, {
         params: {
           shopId: shopId,
           query: userMessage

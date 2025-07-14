@@ -39,8 +39,8 @@ export default function ShopAnalysis({ shopId }) {
     try {
       setLoading(true);
       const [shopResponse, trendsResponse] = await Promise.all([
-        axios.get(`http://localhost:5001/api/forecasting/shop-summary?shopId=${shopId}`),
-        axios.get(`http://localhost:5001/api/forecasting/product-trends`)
+        axios.get(`http://65.2.183.147:5001/api/forecasting/shop-summary?shopId=${shopId}`),
+        axios.get(`http://65.2.183.147:5001/api/forecasting/product-trends`)
       ]);
 
       setShopData(shopResponse.data);

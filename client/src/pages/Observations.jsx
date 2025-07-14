@@ -28,7 +28,7 @@ export default function Observations() {
       try {
         setLoading(true);
         setError(null);
-        const response = await api.get(`http://localhost:8080/api/getForecast?shopId=${selectedShop}`);
+        const response = await api.get(`http://65.2.183.147:8080/api/getForecast?shopId=${selectedShop}`);
         setForecastData(response.data.forecast);
       } catch (err) {
         console.error('Error fetching forecast:', err);

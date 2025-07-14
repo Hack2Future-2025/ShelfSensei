@@ -79,7 +79,7 @@ export default function Forecasting() {
   const loadAvailableOptions = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:5001/api/forecasting/available-options`);
+      const response = await axios.get(`http://65.2.183.147:5001/api/forecasting/available-options`);
       const transformedShops = response.data.shops.map(shopData => ({
         id: shopData.shop.id,
         name: shopData.shop.name,
@@ -109,7 +109,7 @@ export default function Forecasting() {
         ...(selectedProduct ? { productId: selectedProduct } : {})
       };
 
-      const response = await axios.get('http://localhost:5001/api/forecasting/inventory-trends', { params });
+      const response = await axios.get('http://65.2.183.147:5001/api/forecasting/inventory-trends', { params });
       setForecastData(response.data);
       setError(null);
     } catch (err) {
@@ -122,7 +122,7 @@ export default function Forecasting() {
 
   const fetchTopProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/forecasting/product-trends');
+      const response = await axios.get('http://65.2.183.147:5001/api/forecasting/product-trends');
       setTopProducts(response.data.products);
     } catch (err) {
       console.error('Error fetching top products:', err);
@@ -131,7 +131,7 @@ export default function Forecasting() {
 
   const loadShopSummary = async () => {
     try {
-      const response = await axios.get(`http://localhost:5001/api/forecasting/shop-summary?shopId=${selectedShop.id}`);
+      const response = await axios.get(`http://65.2.183.147:5001/api/forecasting/shop-summary?shopId=${selectedShop.id}`);
       setShopSummary(response.data);
       setError(null);
     } catch (err) {
@@ -142,7 +142,7 @@ export default function Forecasting() {
   const loadForecast = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5001/api/forecasting/inventory-trends?shopId=${selectedShop.id}&productId=${selectedProduct.id}`
+        `http://65.2.183.147:5001/api/forecasting/inventory-trends?shopId=${selectedShop.id}&productId=${selectedProduct.id}`
       );
       setForecast(response.data);
       setError(null);

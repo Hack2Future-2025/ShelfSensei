@@ -263,7 +263,7 @@ export default function Products() {
   const fetchProducts = async () => {
     try {
       const [productsRes, categoriesRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/products', {
+        axios.get('http://65.2.183.147:5000/api/products', {
           params: {
             page,
             limit,
@@ -273,7 +273,7 @@ export default function Products() {
             category: selectedCategory
           }
         }),
-        axios.get('http://localhost:5000/api/categories')
+        axios.get('http://65.2.183.147:5000/api/categories')
       ]);
 
       setProducts(productsRes.data.data);
@@ -303,7 +303,7 @@ export default function Products() {
 
   const handleAddProduct = async (formData) => {
     try {
-      await axios.post('http://localhost:5000/api/products', {
+      await axios.post('http://65.2.183.147:5000/api/products', {
         name: formData.name,
         cat_id: formData.categoryId ? parseInt(formData.categoryId) : null,
         price: formData.price ? parseFloat(formData.price) : 0
@@ -317,7 +317,7 @@ export default function Products() {
 
   const handleEditProduct = async (formData) => {
     try {
-      await axios.put(`http://localhost:5000/api/products/${selectedProduct.id}`, {
+      await axios.put(`http://65.2.183.147:5000/api/products/${selectedProduct.id}`, {
         name: formData.name,
         cat_id: formData.categoryId ? parseInt(formData.categoryId) : null,
         price: formData.price ? parseFloat(formData.price) : 0
