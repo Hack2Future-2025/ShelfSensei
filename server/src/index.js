@@ -20,7 +20,7 @@ const prisma = new PrismaClient();
 
 // CORS configuration
 app.use(cors({
-  origin: '*', // Vite dev server
+  origin: 'http://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
